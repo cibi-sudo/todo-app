@@ -1,1 +1,1 @@
-# Firat full stack project
+# First full stack project
