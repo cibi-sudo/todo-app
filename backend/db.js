@@ -10,6 +10,10 @@ const todoSchema = new Schema({
     type: ObjectId,
     ref: "user",
   },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
 const userSchema = new Schema({

@@ -5,10 +5,6 @@ const createTodo = z.object({
   description: z.string().min(1, "Description is required"),
 });
 
-const updateTodo = z.object({
-  id: z.string().nonempty("ID cannot be empty"),
-});
-
 const userTodo = z.object({
   email: z.string().email("Invalid email format"),
   firstName: z.string().min(1, "First name is required"),
@@ -23,7 +19,6 @@ const userLoginTodo = z.object({
 
 module.exports = {
   createTodo,
-  updateTodo,
   userTodo,
   userLoginTodo,
 };

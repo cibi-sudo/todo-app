@@ -5,30 +5,10 @@ import PreviewTodos from "../components/todoActions";
 const token = localStorage.getItem("token");
 
 const Todos = () => {
-  const [todos, setTodos] = useState([]);
   const [todoData, setTodoData] = useState({
     title: "",
     description: "",
   });
-
-  const previewTodos = () => {
-    axios
-      .get("http://localhost:3000/api/v1/todo/preview", {
-        headers: {
-          token: token,
-        },
-      })
-      .then((response) => {
-        setTodos(response.data);
-      })
-      .catch((err) => {
-        console.error("Error fetching todos:", err);
-      });
-  };
-
-  useEffect(() => {
-    previewTodos();
-  }, [todos]);
 
   const handleInputChange = (e) => {
     setTodoData({ ...todoData, [e.target.name]: e.target.value });
@@ -77,7 +57,7 @@ const Todos = () => {
           Add a Todo
         </button>
       </div>
-      <PreviewTodos todos={todos}></PreviewTodos>
+      <PreviewTodos></PreviewTodos>
     </div>
   );
 };
