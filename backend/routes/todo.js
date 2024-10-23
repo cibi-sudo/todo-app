@@ -18,7 +18,7 @@ todoRouter.post("/create", userMiddleware, async (req, res) => {
       completed: false,
       creatorId: userId,
     });
-    res.json({ msg: "Todo created successfully" });
+    res.status(201).json({ msg: "Todo created successfully" });
   } catch (e) {
     console.log(e);
   }

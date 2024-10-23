@@ -11,8 +11,8 @@ const updateTodo = z.object({
 
 const userTodo = z.object({
   email: z.string().email("Invalid email format"),
-  firstname: z.string().min(1, "First name is required"),
-  lastname: z.string().min(1, "Last name is required"),
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
   password: z.string().min(8, "Password must be at least 8 characters long"),
 });
 

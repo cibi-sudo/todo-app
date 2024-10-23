@@ -1,16 +1,20 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { MdDelete } from "react-icons/md";
+import { IoCheckmarkDoneSharp } from "react-icons/io5";
+import { IoCheckmark } from "react-icons/io5";
 
-export function Todos({ todos }) {
+export function PreviewTodos({ todos }) {
   const [todoList, setTodoList] = useState([]);
 
   useEffect(() => {
+    console.log("Received todos:", todos);
     setTodoList(todos);
   }, [todos]);
 
   const markTodoCompleted = (id) => {
     axios
-      .put("http://localhost:3000/api/v1/todo/completed", { id })
+      .put("http://localhost:3000/api/v1/todo/complete", { id })
       .then(() => {
         setTodoList((prevTodos) =>
           prevTodos.map((todo) =>
@@ -57,14 +61,14 @@ export function Todos({ todos }) {
               }`}
               disabled={todo.completed}
             >
-              {todo.completed ? "Completed" : "Mark as Completed"}
+              {todo.completed ? <IoCheckmarkDoneSharp /> : <IoCheckmark />}
             </button>
 
             <button
               className="absolute px-2 py-1 font-bold text-white bg-red-500 rounded cursor-pointer top-2 right-2 hover:bg-red-600 focus:outline-none focus:shadow-outline"
               onClick={() => deleteTodo(todo._id)}
             >
-              Delete
+              <MdDelete />
             </button>
           </div>
         ))
@@ -76,3 +80,5 @@ export function Todos({ todos }) {
     </div>
   );
 }
+
+export default PreviewTodos;

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const AuthForm = () => {
   const [isSignUp, setIsSignUp] = useState(true);
@@ -19,17 +20,23 @@ const AuthForm = () => {
     setPasswordVisible(!passwordVisible);
   };
 
+  const navigate = useNavigate();
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(formData);
+    // console.log(formData);
     const endpoint = isSignUp ? "/signup" : "/signin";
     axios
       .post(`http://localhost:3000/api/v1/user${endpoint}`, formData)
       .then((response) => {
-        console.log(response.data);
+        // console.log(response.data);
+        const token = response.data.token;
+        localStorage.setItem("token", token);
+        // console.log("Token stored in localStorage:", token);
+        navigate("/Todo");
       })
       .catch((err) => {
-        console.log("Error: " + err);
+        console.error("Error: " + err);
       });
   };
 
