@@ -1,76 +1,20 @@
-import { useState, useEffect } from "react";
-import axios from "axios";
 import { MdDelete } from "react-icons/md";
 import { IoCheckmark, IoAddCircleOutline } from "react-icons/io5";
 import { BsFillCheckCircleFill } from "react-icons/bs";
 
-const token = localStorage.getItem("token");
-
-export function PreviewTodos() {
-  const [todoList, setTodoList] = useState([]);
-
-  const previewTodos = () => {
-    axios
-      .get("http://localhost:3000/api/v1/todo/preview", {
-        headers: { token: token },
-      })
-      .then((response) => {
-        // console.log(response.data.todos);
-        setTodoList(response.data.todos);
-      })
-      .catch((err) => {
-        if (err.response && err.response.status === 404) {
-          console.error("No todos found for this user.");
-        } else {
-          console.error("Error fetching todos:", err);
-        }
-      });
-  };
-
-  useEffect(() => {
-    previewTodos();
-  }, []);
-
-  const markTodoCompleted = (id) => {
-    axios
-      .put(
-        "http://localhost:3000/api/v1/todo/complete",
-        { id },
-        {
-          headers: { token: token },
-        }
-      )
-      .then(() => {
-        setTodoList((prevTodos) =>
-          prevTodos.map((todo) =>
-            todo._id === id ? { ...todo, completed: true } : todo
-          )
-        );
-      })
-      .catch((error) => {
-        console.error("Error updating todo:", error);
-      });
-  };
-
-  const deleteTodo = (id) => {
-    axios
-      .delete(`http://localhost:3000/api/v1/todo/deleteTodo/${id}`, {
-        headers: { token: token },
-      })
-      .then(() => {
-        setTodoList((prevTodos) => prevTodos.filter((todo) => todo._id !== id));
-      })
-      .catch((error) => {
-        console.error("Error deleting todo:", error);
-      });
-  };
-
+const previewTodo = ({
+  todoList,
+  markTodoCompleted,
+  deleteTodo,
+  newTodoRef,
+}) => {
   return (
-    <div className="grid w-full grid-cols-1 gap-6 p-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+    <div className="grid w-full grid-cols-1 gap-6 p-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 bg-gradient-to-r from-blue-500 to-pink-500">
       {todoList.length > 0 ? (
-        todoList.map((todo) => (
+        todoList.map((todo, index) => (
           <div
             key={todo._id}
+            ref={index === todoList.length - 1 ? newTodoRef : null}
             className={`relative p-6 rounded-lg shadow-md  ${
               todo.completed
                 ? "bg-gradient-to-r from-teal-200 to-teal-300 border-teal-400"
@@ -114,6 +58,6 @@ export function PreviewTodos() {
       )}
     </div>
   );
-}
+};
 
-export default PreviewTodos;
+export default previewTodo;

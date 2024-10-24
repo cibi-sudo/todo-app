@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import axios from "axios";
-import PreviewTodos from "../components/todoActions";
+import CreateTodo from "../components/CreateTodo";
+import PreviewTodo from "../components/PreviewTodo";
 
 const token = localStorage.getItem("token");
 
@@ -9,6 +10,10 @@ const Todos = () => {
     title: "",
     description: "",
   });
+
+  const [todoList, setTodoList] = useState([]);
+  const [isTodoAdded, setIsTodoAdded] = useState(false);
+  const newTodoRef = useRef(null);
 
   const handleInputChange = (e) => {
     setTodoData({ ...todoData, [e.target.name]: e.target.value });
@@ -24,40 +29,89 @@ const Todos = () => {
       .then(() => {
         // console.log("Todo added");
         setTodoData({ title: "", description: "" });
+        setIsTodoAdded(true);
       })
       .catch((err) => {
         console.error("Error while adding todo:", err);
       });
   };
 
+  const previewTodos = () => {
+    axios
+      .get("http://localhost:3000/api/v1/todo/preview", {
+        headers: { token: token },
+      })
+      .then((response) => {
+        // console.log(response.data.todos);
+        setTodoList(response.data.todos);
+      })
+      .catch((err) => {
+        if (err.response && err.response.status === 404) {
+          console.error("No todos found for this user.");
+        } else {
+          console.error("Error fetching todos:", err);
+        }
+      });
+  };
+
+  useEffect(() => {
+    previewTodos();
+  }, [todoData]);
+
+  useEffect(() => {
+    if (isTodoAdded && newTodoRef.current) {
+      newTodoRef.current.scrollIntoView({ behavior: "smooth" });
+      setIsTodoAdded(false);
+    }
+  }, [todoList, isTodoAdded]);
+
+  const markTodoCompleted = (id) => {
+    axios
+      .put(
+        "http://localhost:3000/api/v1/todo/complete",
+        { id },
+        {
+          headers: { token: token },
+        }
+      )
+      .then(() => {
+        setTodoList((prevTodos) =>
+          prevTodos.map((todo) =>
+            todo._id === id ? { ...todo, completed: true } : todo
+          )
+        );
+      })
+      .catch((error) => {
+        console.error("Error updating todo:", error);
+      });
+  };
+
+  const deleteTodo = (id) => {
+    axios
+      .delete(`http://localhost:3000/api/v1/todo/deleteTodo/${id}`, {
+        headers: { token: token },
+      })
+      .then(() => {
+        setTodoList((prevTodos) => prevTodos.filter((todo) => todo._id !== id));
+      })
+      .catch((error) => {
+        console.error("Error deleting todo:", error);
+      });
+  };
+
   return (
-    <div className="flex flex-col items-center justify-center w-full min-h-screen bg-gradient-to-r from-blue-500 to-pink-500">
-      <div className="p-8 mb-8 bg-white rounded shadow-lg w-96">
-        <h2 className="mb-4 text-2xl font-bold text-center">Create a Todo</h2>
-        <input
-          type="text"
-          name="title"
-          placeholder="Title"
-          value={todoData.title}
-          onChange={handleInputChange}
-          className="w-full px-3 py-2 mb-4 border border-gray-300 rounded focus:outline-none focus:border-pink-500"
-        />
-        <input
-          type="text"
-          name="description"
-          placeholder="Description"
-          value={todoData.description}
-          onChange={handleInputChange}
-          className="w-full px-3 py-2 mb-4 border border-gray-300 rounded focus:outline-none focus:border-pink-500"
-        />
-        <button
-          onClick={submitTodo}
-          className="px-4 py-2 font-bold text-white bg-pink-500 rounded hover:bg-pink-600 focus:outline-none focus:shadow-outline"
-        >
-          Add a Todo
-        </button>
-      </div>
-      <PreviewTodos></PreviewTodos>
+    <div>
+      <CreateTodo
+        todoData={todoData}
+        handleInputChange={handleInputChange}
+        submitTodo={submitTodo}
+      />
+      <PreviewTodo
+        todoList={todoList}
+        markTodoCompleted={markTodoCompleted}
+        deleteTodo={deleteTodo}
+        newTodoRef={newTodoRef}
+      />
     </div>
   );
 };
