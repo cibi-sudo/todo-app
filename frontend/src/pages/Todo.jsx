@@ -2,8 +2,10 @@ import { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import CreateTodo from "../components/CreateTodo";
 import PreviewTodo from "../components/PreviewTodo";
+import { useNavigate } from "react-router-dom";
 
 const token = localStorage.getItem("token");
+// console.log(token);
 
 const Todos = () => {
   const [todoData, setTodoData] = useState({
@@ -56,7 +58,7 @@ const Todos = () => {
 
   useEffect(() => {
     previewTodos();
-  }, [todoData]);
+  }, [isTodoAdded]);
 
   useEffect(() => {
     if (isTodoAdded && newTodoRef.current) {
@@ -99,12 +101,20 @@ const Todos = () => {
       });
   };
 
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/");
+  };
+
   return (
     <div>
       <CreateTodo
         todoData={todoData}
         handleInputChange={handleInputChange}
         submitTodo={submitTodo}
+        handleLogout={handleLogout}
       />
       <PreviewTodo
         todoList={todoList}
